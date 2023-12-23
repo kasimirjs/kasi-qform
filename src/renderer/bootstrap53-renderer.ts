@@ -36,6 +36,14 @@ export class Bootstrap53Renderer {
         for (const field of config.fields) {
             let fieldElement: HTMLElement;
 
+            if (field.type === undefined) {
+                if (field.html)
+                    field.type = "html";
+                else if (field.options)
+                    field.type = "select";
+                else
+                    field.type = "text";
+            }
             switch (field.type) {
                 case undefined:
                 case 'text':
@@ -51,7 +59,8 @@ export class Bootstrap53Renderer {
                     fieldElement = this.createTextareaField(field, config.size, config.style);
                     break;
                 case 'checkbox':
-                    fieldElement = this.createCheckboxField(field, config.size, config.style);
+                case 'switch': // Treat 'switch' type similar to 'checkbox'
+                    fieldElement = this.createCheckboxField(field, config.size, config.style, field.type === 'switch');
                     break;
                 case 'radio':
                     fieldElement = this.createRadioField(field, config.size);
@@ -60,7 +69,11 @@ export class Bootstrap53Renderer {
                     fieldElement = this.createElement('hr');
                     break;
                 case 'description':
-                    fieldElement = this.createElement('p', {}, [document.createTextNode(field.label || '')]);
+                    fieldElement = this.createElement('p', {}, [document.createTextNode(field.desc || '')]);
+                    break;
+                case "html":
+                    fieldElement = this.createElement('div', {});
+                    fieldElement.innerHTML = field.html || '';
                     break;
                 case 'button':
                     fieldElement = this.createButton(field, config.size);
@@ -139,8 +152,9 @@ export class Bootstrap53Renderer {
         return this.wrapWithFormGroup(textarea, field.label, id, field.style || groupStyle, field.help, field.desc);
     }
 
-    private createCheckboxField(field: FormInputConfig, size?: string, groupStyle?: string): HTMLElement {
-        const checkboxDiv = this.createElement('div', {class: field.style === "inline" ? 'form-check form-check-inline' : 'form-check'});
+    private createCheckboxField(field: FormInputConfig, size?: string, groupStyle?: string, isSwitch: boolean = false): HTMLElement {
+        let checkboxDiv = this.createElement('div', {class: field.style === "inline" ? 'form-check form-check-inline' : 'form-check'});
+        const switchClass = isSwitch ? 'form-switch' : '';
         if (field.options && Array.isArray(field.options)) {
             for (let option of field.options) {
                 // Check if option is string
@@ -157,7 +171,7 @@ export class Bootstrap53Renderer {
                     type: 'checkbox',
                     id: id,
                     name: field.name,
-                    class: `form-check-input ${size ? `form-check-input-${size}` : ''} `.trim(),
+                    class: `form-check-input ${switchClass} ${size ? `form-check-input-${size}` : ''} `.trim(),
                     value: option.value || ''
                 });
                 if (option.checked) {
@@ -170,7 +184,7 @@ export class Bootstrap53Renderer {
                     class: 'form-check-label'
                 }, [document.createTextNode(option.text || '')]);
 
-                checkboxDiv.appendChild(this.createElement('div', {class: `form-check ${field.style === 'inline' ? 'form-check-inline' : ''}`}, [checkbox, label]));
+                checkboxDiv.appendChild(this.createElement('div', {class: `form-check ${switchClass} ${field.style === 'inline' ? 'form-check-inline' : ''}`}, [checkbox, label]));
             }
         } else {
             const id = field.id || this.generateId();
@@ -188,8 +202,7 @@ export class Bootstrap53Renderer {
                 for: id,
                 class: 'form-check-label'
             }, [document.createTextNode(field.label || '')]);
-            checkboxDiv.appendChild(checkbox);
-            checkboxDiv.appendChild(label);
+            checkboxDiv = this.createElement('div', {class: `form-check ${switchClass}`}, [checkbox, label]);
         }
 
         return this.wrapWithFormGroup(checkboxDiv,  field.options ? field.label : '', undefined, groupStyle, field.help, field.desc);

@@ -23,7 +23,11 @@ registerExample({
                     help: "This is a help text2"
                 },
                 {name: "callback", type: "radio", style: "inline", options: ["Yes", "No"], label: "Callback", default: "Yes"},
-                {name: "callback1", type: "checkbox", style: "inline", label: "Accept terms and conditions", default: "Yes"},
+                {name: "callback1", type: "checkbox", label: "Accept terms and conditions", default: "Yes"},
+                {name: "callback1", type: "switch", label: "Accept terms and conditions", default: "Yes"},
+                {type: "hr"},
+                {type: "description", desc: "This is a description from a text element"},
+                {html: "<b>This is a html</b> from a text element"},
                 {name: "callback2", type: "checkbox", label: "Checkbox with options", options: ["option a", "option b"], default: "Yes"},
                 {name: "callback2", type: "checkbox", style: "inline", label: "Checkbox with options (inline)", options: ["option a", "option b"], default: "Yes"},
             ],

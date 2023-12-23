@@ -10,13 +10,14 @@ export type FormInputConfig = {
      * - description: Will output a <detail><summary> field with the label as summary and the description as detail
      * - hr: Will output a <hr> tag
      * - html: Will output the html as is (auto-detected if html is set)
+     * - switch: Same as checkbox, but with a switch style
      */
-    type?: "text" | "email" | "password" | "switch" | "textarea" | "date" | "time" | "datetime" | "select" | "radio" | "checkbox" | "description" | "hr" | null;
+    type?: "text" | "email" | "password" | "switch" | "textarea" | "date" | "time" | "datetime" | "select" | "radio" | "checkbox" | "description" | "hr" | "html" | null;
 
     /**
      * The name of the form field (used for the name attribute, id attribute and label and bind if not set)
      */
-    name: string;
+    name?: string;
     id?: string | null;
     label?: string | null;
     placeholder?: string | null;
