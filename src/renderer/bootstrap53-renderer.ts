@@ -1,4 +1,4 @@
-import {FormGroupConfig, FormInputConfig} from "../config/form-config";
+import {FormGroupConfig, FormInputConfig, ValidationState} from "../config/form-config";
 
 export class Bootstrap53Renderer {
 
@@ -14,12 +14,50 @@ export class Bootstrap53Renderer {
     }
 
     /**
+     * Sets the validation state of the rendered form elements. Elements are identified by their name.
+     *
+     * It changes the validation state of the elements in parameter2. If parameter2 is an array, it changes the validation state of all elements in the array.
+     *
+     * If validationState is true, all elements are marked as valid. If validationState is false, all elements are marked as invalid.
+     *
+     * @param element   The Div Element containing the rendered form (returned by render())
+     * @param validationState
+     */
+    public setValidationState(element: HTMLElement, validationState: ValidationState|ValidationState[]|true|false = []): void {
+        const states = Array.isArray(validationState) ? validationState : [validationState];
+        for (const state of states) {
+            const inputElements = element.querySelectorAll(`[name="${state.name}"]`);
+            inputElements.forEach(inputElement => {
+                if (inputElement instanceof HTMLInputElement || inputElement instanceof HTMLSelectElement || inputElement instanceof HTMLTextAreaElement) {
+                    if (state === true || (typeof state === 'object' && state.valid)) {
+                        inputElement.classList.remove('is-invalid');
+                        inputElement.classList.add('is-valid');
+                        const feedbackElement = inputElement.nextElementSibling;
+                        if (feedbackElement && feedbackElement.classList.contains('invalid-feedback')) {
+                            feedbackElement.textContent = '';
+                        }
+                    } else if (state === false || (typeof state === 'object' && !state.valid)) {
+                        inputElement.classList.remove('is-valid');
+                        inputElement.classList.add('is-invalid');
+                        let feedbackElement = inputElement.nextElementSibling;
+                        if (!feedbackElement || !feedbackElement.classList.contains('invalid-feedback')) {
+                            feedbackElement = this.createElement('div', {class: 'invalid-feedback'});
+                            inputElement.parentNode.insertBefore(feedbackElement, inputElement.nextSibling);
+                        }
+                        feedbackElement.textContent = typeof state === 'object' && state.message ? state.message : 'Invalid input';
+                    }
+                }
+            });
+        }
+    }
+
+    /**
      * Returns a <div> Element containing the rendered form based on the config
      * provided. It uses Bootstrap 5.3 for the rendering.
      *
      * @param config
      */
-    render(config: FormGroupConfig): HTMLDivElement {
+    public render(config: FormGroupConfig): HTMLDivElement {
         const formGroup = this.createElement('div', {class: `form-group ${config.size ? `form-group-${config.size}` : ''}`.trim()});
 
         if (config.title) {

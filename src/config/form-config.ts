@@ -126,3 +126,11 @@ export type FormGroupConfig = {
 
     onsubmit?: (scope: any, config: FormGroupConfig, event: Event) => void;
 };
+
+
+
+export type ValidationState = {
+    name: string;
+    valid: boolean;
+    message?: string;
+}

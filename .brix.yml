@@ -4,5 +4,4 @@ version: '1.0'
 coder:
     include:
         - ./src/
-        - ./docs/
-        - ./examples/
+
