@@ -1,24 +1,13 @@
 import {registerQFormComponent, registerQFormPreset} from "../src/functions";
 import {FormGroupConfig} from "../src/config/form-config";
+import {register} from "@kasimirjs/devdoc/src/register";
+export * from "../examples/basicform";
+
+register();
 
 registerQFormComponent();
 
-// Basic form preset
-registerQFormPreset("basicForm", {
-    title: "Basic Form",
-    description: "A simple form with basic fields",
-    size: "md",
-    fields: [
-        {name: "firstName", label: "First Name", cols: 6, type: "text"},
-        {name: "lastName", label: "Last Name", cols: 6, type: "text"},
-        {name: "email", style:"input-group", label: "Email", type: "email"}
-    ],
-    buttons: [
-        {label: "Submit", type: "submit", class: "btn-primary"},
-        {label: "Ignore", type: "submit"}
 
-    ]
-} as FormGroupConfig);
 
 // Advanced form preset with validation and different field types
 registerQFormPreset("advancedForm", {

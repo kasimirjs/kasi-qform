@@ -11,9 +11,6 @@ command:
 
 
 
-  jekyll: |
-    jekyll serve -s /opt/docs -d /var/www/html --drafts --livereload --port 4000 --livereload-port 4100 --host 0.0.0.0
-
   dev:
     - killall webpack ||  echo "no job"
     - "D:webpack serve"

@@ -69,13 +69,18 @@ export class Bootstrap53Renderer {
                     throw new Error(`Unsupported field type: ${field.type}`);
             }
 
-            if (field.cols) {
-                const col = this.createElement('div', {class: `col-lg-${field.cols}`}, [fieldElement]);
-                row.appendChild(col);
+            // Always attach to row
+            if (field.cols && field.cols > 0) {
+                fieldElement.classList.add(`col-lg-${field.cols}`);
             } else {
-                formGroup.appendChild(fieldElement);
+                fieldElement.classList.add('col-lg-12');
             }
+
+            row.appendChild(fieldElement);
+
         }
+
+
 
         if (row.hasChildNodes()) {
             formGroup.appendChild(row);
@@ -106,7 +111,7 @@ export class Bootstrap53Renderer {
 
         this.applyOptions(input, field.options);
 
-        return this.wrapWithFormGroup(input, field.label, id, field.style || groupStyle);
+        return this.wrapWithFormGroup(input, field.label, id, field.style || groupStyle, field.help, field.desc);
     }
 
     private createSelectField(field: FormInputConfig, size?: string, groupStyle?: string): HTMLElement {
@@ -119,7 +124,7 @@ export class Bootstrap53Renderer {
 
         this.populateSelectOptions(select, field.options, field.defaultValue);
 
-        return this.wrapWithFormGroup(select, field.label, id, field.style || groupStyle);
+        return this.wrapWithFormGroup(select, field.label, id, field.style || groupStyle, field.help, field.desc);
     }
 
     private createTextareaField(field: FormInputConfig, size?: string, groupStyle?: string): HTMLElement {
@@ -133,7 +138,7 @@ export class Bootstrap53Renderer {
 
         this.applyOptions(textarea, field.options);
 
-        return this.wrapWithFormGroup(textarea, field.label, id, field.style || groupStyle);
+        return this.wrapWithFormGroup(textarea, field.label, id, field.style || groupStyle, field.help, field.desc);
     }
 
     private createCheckboxField(field: FormInputConfig, size?: string): HTMLElement {
@@ -158,6 +163,8 @@ export class Bootstrap53Renderer {
 
         const div = this.createElement('div', {class: 'form-check'}, [checkbox, label]);
 
+
+
         return div;
     }
 
@@ -166,7 +173,7 @@ export class Bootstrap53Renderer {
 
         this.populateRadioOptions(div, field, size);
 
-        return this.wrapWithFormGroup(div, field.label);
+        return this.wrapWithFormGroup(div, field.label, undefined, undefined, field.help, field.desc);
     }
 
     private createButton(field: FormInputConfig, size?: string): HTMLElement {
@@ -196,7 +203,7 @@ export class Bootstrap53Renderer {
         return buttonBar;
     }
 
-    private wrapWithFormGroup(element: HTMLElement, label?: string, id?: string, style?: string): HTMLElement {
+    private wrapWithFormGroup(element: HTMLElement, label?: string, id?: string, style?: string, help?: string, desc?: string): HTMLElement {
         const div = this.createElement('div', {class: 'mb-3'});
 
         if (style === 'floating') {
@@ -225,12 +232,26 @@ export class Bootstrap53Renderer {
                     for: id || element.getAttribute('id'),
                     class: 'form-label'
                 }, [document.createTextNode(label)]);
+                if (desc) {
+                    labelElement.appendChild(this.createElement('small', {class: 'form-text text-muted'}, [document.createTextNode(desc)]));
+
+                }
                 div.appendChild(labelElement);
             }
             div.appendChild(element);
         }
 
+        if (help) {
+            const helpElement = this.createHelpText(help);
+            div.appendChild(helpElement);
+        }
+
         return div;
+    }
+
+    private createHelpText(help?: string ): HTMLElement {
+        const helpText = help  || '';
+        return this.createElement('small', {class: 'form-text text-muted'}, [document.createTextNode(helpText)]);
     }
 
     private applyOptions(element: HTMLElement, options: any): void {

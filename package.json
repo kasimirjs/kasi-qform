@@ -1,6 +1,6 @@
 {
-  "name": "@kasimirjs/kit-bootstrap",
-  "version": "1.0.7",
+  "name": "@kasimirjs/qform",
+  "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -19,10 +19,6 @@
     "build": "npm run make.mjs && npm run make.cjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kasimirjs/kasimirjs-kit-bootstrap.git"
-  },
   "author": "Matthias Leuffen",
   "license": "ISC",
   "bugs": {
@@ -34,11 +30,15 @@
     "reflect-metadata": "*"
   },
   "devDependencies": {
+    "@kasimirjs/devdoc": "^1.0.0",
     "esbuild-loader": "^4.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
-  }
+  },
+  "workspaces": [
+    "workspaces/*"
+  ]
 }

@@ -47,7 +47,7 @@ export type FormInputConfig = {
     default?: any;
 
     /**
-     * The description of the form field (used for the aria-describedby attribute and the description)
+     * The description of the form field (used for the aria-describedby attribute and as small muted text as port of the label
      */
     desc?: string | null;
 

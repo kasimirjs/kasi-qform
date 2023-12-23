@@ -22,6 +22,7 @@ module.exports = {
                     path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "workspaces"),
                     path.resolve(__dirname, "showcase"),
+                    path.resolve(__dirname, "examples"),
                 ]
             },
             {
@@ -32,7 +33,7 @@ module.exports = {
             {
                 test: /\.(scss|css)$/,
                 use: [
-                    "style-loader", "css-loader", 'sass-loader'],
+                    "css-loader", 'sass-loader'],
                 include: path.resolve(__dirname, "")
             },
 
