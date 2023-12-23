@@ -66,8 +66,10 @@ export type FormInputConfig = {
     /**
      * The style. If set to "floating" the label will be floating above the input field.
      * If set to "input-group" the label will be inside the input field.
+     *
+     * inline: Only for radio and checkbox. Will print the radio/checkbox inline.
      */
-    style?: "floating" | "input-group" | null;
+    style?: "floating" | "input-group" | "inline" | null;
 
     /**
      * If set, there will be a small button inside the form element to save the changes.

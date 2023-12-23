@@ -51,7 +51,7 @@ export class Bootstrap53Renderer {
                     fieldElement = this.createTextareaField(field, config.size, config.style);
                     break;
                 case 'checkbox':
-                    fieldElement = this.createCheckboxField(field, config.size);
+                    fieldElement = this.createCheckboxField(field, config.size, config.style);
                     break;
                 case 'radio':
                     fieldElement = this.createRadioField(field, config.size);
@@ -79,8 +79,6 @@ export class Bootstrap53Renderer {
             row.appendChild(fieldElement);
 
         }
-
-
 
         if (row.hasChildNodes()) {
             formGroup.appendChild(row);
@@ -122,7 +120,7 @@ export class Bootstrap53Renderer {
             class: `form-select ${size ? `form-select-${size}` : ''}`.trim()
         });
 
-        this.populateSelectOptions(select, field.options, field.defaultValue);
+        this.populateSelectOptions(select, field.options, field.default);
 
         return this.wrapWithFormGroup(select, field.label, id, field.style || groupStyle, field.help, field.desc);
     }
@@ -134,44 +132,73 @@ export class Bootstrap53Renderer {
             name: field.name,
             class: `form-control ${size ? `form-control-${size}` : ''}`.trim(),
             placeholder: field.placeholder || ''
-        }, [document.createTextNode(field.value || field.defaultValue || '')]);
+        }, [document.createTextNode(field.value || field.default || '')]);
 
         this.applyOptions(textarea, field.options);
 
         return this.wrapWithFormGroup(textarea, field.label, id, field.style || groupStyle, field.help, field.desc);
     }
 
-    private createCheckboxField(field: FormInputConfig, size?: string): HTMLElement {
-        const id = field.id || this.generateId();
-        const checkbox = this.createElement('input', {
-            type: 'checkbox',
-            id: id,
-            name: field.name,
-            class: `form-check-input ${size ? `form-check-input-${size}` : ''}`.trim(),
-            value: field.value || field.defaultValue || ''
-        });
-        if (field.checked || (field.defaultValue === 'checked')) {
-            checkbox.setAttribute('checked', 'checked');
+    private createCheckboxField(field: FormInputConfig, size?: string, groupStyle?: string): HTMLElement {
+        const checkboxDiv = this.createElement('div', {class: field.style === "inline" ? 'form-check form-check-inline' : 'form-check'});
+        if (field.options && Array.isArray(field.options)) {
+            for (let option of field.options) {
+                // Check if option is string
+                if (typeof option === 'string') {
+                    option = {
+                        text: option,
+                        value: option
+                    };
+
+                }
+
+                const id = option.id || this.generateId();
+                const checkbox = this.createElement('input', {
+                    type: 'checkbox',
+                    id: id,
+                    name: field.name,
+                    class: `form-check-input ${size ? `form-check-input-${size}` : ''} `.trim(),
+                    value: option.value || ''
+                });
+                if (option.checked) {
+                    checkbox.setAttribute('checked', 'checked');
+                }
+
+
+                const label = this.createElement('label', {
+                    for: id,
+                    class: 'form-check-label'
+                }, [document.createTextNode(option.text || '')]);
+
+                checkboxDiv.appendChild(this.createElement('div', {class: `form-check ${field.style === 'inline' ? 'form-check-inline' : ''}`}, [checkbox, label]));
+            }
+        } else {
+            const id = field.id || this.generateId();
+            const checkbox = this.createElement('input', {
+                type: 'checkbox',
+                id: id,
+                name: field.name,
+                class: `form-check-input ${size ? `form-check-input-${size}` : ''}`.trim(),
+                value: field.value || field.default || ''
+            });
+            if (field.checked || (field.default === true)) {
+                checkbox.setAttribute('checked', 'checked');
+            }
+            const label = this.createElement('label', {
+                for: id,
+                class: 'form-check-label'
+            }, [document.createTextNode(field.label || '')]);
+            checkboxDiv.appendChild(checkbox);
+            checkboxDiv.appendChild(label);
         }
 
-        this.applyOptions(checkbox, field.options);
-
-        const label = this.createElement('label', {
-            for: id,
-            class: 'form-check-label'
-        }, [document.createTextNode(field.label || '')]);
-
-        const div = this.createElement('div', {class: 'form-check'}, [checkbox, label]);
-
-
-
-        return div;
+        return this.wrapWithFormGroup(checkboxDiv,  field.options ? field.label : '', undefined, groupStyle, field.help, field.desc);
     }
 
     private createRadioField(field: FormInputConfig, size?: string): HTMLElement {
-        const div = this.createElement('div');
+        const div = this.createElement('div', {class: field.style === "inline" ? 'form-check form-check-inline' : 'form-check'});
 
-        this.populateRadioOptions(div, field, size);
+        this.populateRadioOptions(div, field, size, field.style);
 
         return this.wrapWithFormGroup(div, field.label, undefined, undefined, field.help, field.desc);
     }
@@ -290,7 +317,7 @@ export class Bootstrap53Renderer {
         }
     }
 
-    private populateRadioOptions(div: HTMLElement, field: FormInputConfig, size?: string): void {
+    private populateRadioOptions(div: HTMLElement, field: FormInputConfig, size?: string, style?: string): void {
         const options = field.options;
         if (options instanceof Array) {
             for (const value of options) {
@@ -302,7 +329,7 @@ export class Bootstrap53Renderer {
                     class: `form-check-input ${size ? `form-check-input-${size}` : ''}`.trim(),
                     value: value
                 });
-                if (field.defaultValue && field.defaultValue === value) {
+                if (field.default && field.default === value) {
                     radio.setAttribute('checked', 'checked');
                 }
 
@@ -311,7 +338,7 @@ export class Bootstrap53Renderer {
                     class: 'form-check-label'
                 }, [document.createTextNode(value)]);
 
-                const radioDiv = this.createElement('div', {class: 'form-check'}, [radio, label]);
+                const radioDiv = this.createElement('div', {class: style === "inline" ? 'form-check form-check-inline' : 'form-check'}, [radio, label]);
 
                 div.appendChild(radioDiv);
             }
@@ -325,7 +352,7 @@ export class Bootstrap53Renderer {
                     class: `form-check-input ${size ? `form-check-input-${size}` : ''}`.trim(),
                     value: option.value
                 });
-                if (option.checked || (field.defaultValue && field.defaultValue === option.value)) {
+                if (option.checked || (field.default && field.default === option.value)) {
                     radio.setAttribute('checked', 'checked');
                 }
 
@@ -336,7 +363,7 @@ export class Bootstrap53Renderer {
                     class: 'form-check-label'
                 }, [document.createTextNode(option.label)]);
 
-                const radioDiv = this.createElement('div', {class: 'form-check'}, [radio, label]);
+                const radioDiv = this.createElement('div', {class: style === "inline" ? 'form-check form-check-inline' : 'form-check'}, [radio, label]);
 
                 div.appendChild(radioDiv);
             }
